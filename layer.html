@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leaflet Layers Control Example</title>
+	<meta charset="utf-8" />
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="http://leafletjs.com/dist/leaflet.css" />
+	<!--[if lte IE 8]><link rel="stylesheet" href="../dist/leaflet.ie.css" /><![endif]-->
+</head>
+<body>
+	<div id="map" style="width: 600px; height: 400px"></div>
+
+	<script src="http://leafletjs.com/dist/leaflet.js"></script>
+	<script src="./hos_doc.js"></script>
+	<script>
+		var hospitals = new L.LayerGroup();
+		var doctors = new L.LayerGroup();
+
+		for (var key in data.elements) {
+			var n = data.elements[key];
+			if (n.type == "node") {
+				if (n.tags.amenity == "hospital") {
+					L.marker([n.lat,n.lon]).bindPopup(n.tags.name).addTo(hospitals);
+				} else if (n.tags.amenity == "doctors") {
+					L.marker([n.lat,n.lon]).bindPopup(n.tags.name).addTo(doctors);
+				}
+			}
+		}
+
+		var cmAttr = 'Map data &copy; 2011 OpenStreetMap contributors, Imagery &copy; 2011 CloudMade',
+			cmUrl = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/{styleId}/256/{z}/{x}/{y}.png';
+
+		var minimal   = L.tileLayer(cmUrl, {styleId: 22677, attribution: cmAttr}),
+			midnight  = L.tileLayer(cmUrl, {styleId: 999,   attribution: cmAttr});
+
+		var map = L.map('map', {
+			center: [53.3327187, -6.2559869],
+			zoom: 13,
+			layers: [minimal, hospitals, doctors]
+		});
+
+		var baseLayers = {
+			"Minimal": minimal,
+			"Night View": midnight
+		};
+
+		var overlays = {
+			"Hospitals": hospitals,
+			"Doctors": doctors
+		};
+
+		L.control.layers(baseLayers, overlays).addTo(map);
+	</script>
+</body>
+</html>
+
